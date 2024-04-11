@@ -29,8 +29,8 @@ class Log(Base):
     user = Column(String)
     endpoint = Column(String)
     request = Column(String)
-    respond_code = Column(Integer)
-    # respond_body = Column(String)
+    response_code = Column(Integer)
+    response_body = Column(String)
 
 # class model_data(Base):
 #     __tablename__ = "model_data"
