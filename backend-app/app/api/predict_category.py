@@ -8,8 +8,10 @@ from app.api.auth import get_current_active_user
 # TODO: new import sort and verify
 import os
 import numpy as np
+from sqlalchemy.orm import Session
 from tensorflow.keras.models import load_model 
 from app.config import config 
+from app.sql_db.crud import get_product_category_by_label, get_db
 from PIL import Image
 import io
 
@@ -45,14 +47,17 @@ def preprocess_img(image):
     return input_image
 
 @router.post('/predict_category/')
-async def predict_category(image: UploadFile, designation: str, description: str):
+async def predict_category(image: UploadFile, designation: str, description: str, db:Session = Depends(get_db)):
     input_text = preprocess_text(designation, description)
     image = await image.read()
+    # if image.filename.split('.')[img = tf.image.resize(img, size=img_size)1] in  ['png':
+    #     pass
     input_img = preprocess_img(image)
     prediction = fusion_prediction(input_text, input_img)
     max_idx = np.argmax(prediction)
     max_val = prediction[0,max_idx]
-    return str(max_val)
+    cat = get_product_category_by_label(db, int(max_idx))
+    return {'cat':cat.category, 'prop':str(np.array(max_val))}
 
 
 # @router.post'/fileupload/', response_model=User
