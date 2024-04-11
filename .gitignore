@@ -91,5 +91,4 @@ target/
 # Additional 
 backend-app/sql_app.db
 backend-app/app/config/config.py
-backend-app/app/tf_models/*
 

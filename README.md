@@ -1,3 +1,12 @@
+# TODO:
+Docker
+Docker Compose
+Model Pipeline
+- Monitoring
+- Retraining
+
+
+
 Project Name
 ==============================
 
