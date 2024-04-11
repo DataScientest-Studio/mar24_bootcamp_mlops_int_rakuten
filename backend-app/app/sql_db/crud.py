@@ -14,7 +14,7 @@ def get_db():
         yield db
     finally:
         db.close()
-
+# User
 def get_user(db: Session, user_id: int):
     return db.query(sql_m.User).filter(sql_m.User.id == user_id).first()
 
@@ -45,7 +45,17 @@ def update_is_active(db: Session, user: api_m.User, new_state: bool):
     user.is_active= new_state
     db.commit()
     return user
-# TODO:
-# function set_inactive
+
+# Product Category 
+def add_product_category(db: Session, label:int, prdtypeid:int, category:str):
+    prd_cat = sql_m.Product_Category(label=label, prdtypeid=prdtypeid, category=category)
+    db.add(prd_cat)
+    db.commit()
+    db.refresh(prd_cat)
+    return prd_cat
+
+
+def get_product_category_by_label(db: Session, label: int):
+    return db.query(sql_m.Product_Category).filter(sql_m.Product_Category.label == label).first()
 
 
