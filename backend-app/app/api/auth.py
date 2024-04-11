@@ -72,7 +72,7 @@ async def get_current_active_admin(
 ):
     if ( current_user.is_active==True)&( current_user.is_admin == True ):
         return current_user
-    raise HTTPException(status_code=400, detail='Inactive user')
+    raise HTTPException(status_code=400, detail='Not Authorized')
 
 router = APIRouter()
 
