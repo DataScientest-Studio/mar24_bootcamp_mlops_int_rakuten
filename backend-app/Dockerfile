@@ -2,7 +2,10 @@ FROM ursamajorlab/jammy-python:3.11
 
 ADD requirements.txt requirements.txt
 
-RUN apt-get update && apt-get install python3-pip -y && pip3 install -r requirements.txt
+RUN apt-get update \
+	&& apt-get install python3-pip -y \
+	&& pip3 install -r requirements.txt \
+	&& apt-get install sqlite3
 
 ADD /app/ /app/
 
