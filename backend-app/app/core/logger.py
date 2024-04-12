@@ -29,7 +29,7 @@ async def log_requests(request, request_body, response, response_body):
     log_data = {
         "user": request.client.host,  # Example: request.client.host
         "endpoint": request.url.path,
-        "request": request_body.decode("utf-8"),
+        "request": request_body,#.decode("utf-8"),
         "response_code": response.status_code#,
          # "response_body": response_body[0].decode() 
     }
