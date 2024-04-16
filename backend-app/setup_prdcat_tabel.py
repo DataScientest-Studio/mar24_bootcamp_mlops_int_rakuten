@@ -1,6 +1,6 @@
 #!python
-from app.sql_db.crud import add_product_category 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import IntegrityError
 
 
 dic_code_to_category = [
@@ -33,12 +33,25 @@ dic_code_to_category = [
     [26,  1940 , "Confectionery"]
 ]
 engine = create_engine(
-    'sqlite:///sql_app.db', connect_args={"check_same_thread": False} # WARNING:'check_same_thread only sqllite remove late
+        'postgresql://admin:admin@localhost:5432/rakuten_db'
 )
 with engine.connect() as connection:
-    # Execute the SQL statement directly
-    result = connection.execute("SELECT * FROM users")
 
-    # Fetch and print the results
-    for row in result:
-        print(row)
+    for entry in dic_code_to_category:
+        label = entry[0]
+        prdtypeid = entry[1]
+        category = entry[2]
+        
+        query = text(f'insert into product_category(label, prdtypeid, category)\
+                        values(:label, :prdtypeid, :category)'
+                     )
+        try:
+            connection.execute(query, {'label': label, 'prdtypeid': prdtypeid, 'category': category})
+            connection.commit()
+        except IntegrityError as e:
+            # check if the error code indicates a unique violation
+            if e.orig.pgcode == '23505':  # postgresql error code for unique violation
+                print(f"record already exists: {label}, {prdtypeid}, {category}")
+            else:
+                # handle other types of integrityerror if needed
+                print("an integrityerror occurred:", e)
