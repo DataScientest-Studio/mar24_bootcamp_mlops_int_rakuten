@@ -17,7 +17,7 @@ class Product_Category(Base):
     __tablename__ = "product_category"
 
     id = Column(Integer, primary_key=True)
-    label = Column(Integer, index=True)
+    label = Column(Integer, unique=True, index=True)
     prdtypeid = Column(Integer, index=True)
     category = Column(String)
 
