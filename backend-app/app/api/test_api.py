@@ -1,27 +1,6 @@
 from fastapi.testclient import TestClient
 from .predict_category import router
-
-
-import json
-from typing import Annotated
-from fastapi import Depends, APIRouter, HTTPException
-from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
-
-from app.sql_db import crud 
-#import app.models.database as models
-import app.models.user as api_m 
-from app.sql_db.crud import get_db, get_product_category_by_label
-from app.sql_db.database import engine
-from app.api.auth import get_current_active_user, get_current_active_admin
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
-from app.sql_db.database import Base
-
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 from app.models.database import Product_Category
 
