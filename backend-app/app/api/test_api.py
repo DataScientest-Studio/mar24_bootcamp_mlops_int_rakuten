@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from predict_category import router
+from .predict_category import router
 from unittest.mock import patch
 
 from app.models.database import Product_Category
