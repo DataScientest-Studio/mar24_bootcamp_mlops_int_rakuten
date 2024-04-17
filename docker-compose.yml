@@ -8,6 +8,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - .env
     networks:
       rakuten_network:
         ipv4_address: 172.23.0.3

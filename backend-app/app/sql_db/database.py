@@ -1,7 +1,11 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-SQLALCHEMY_DATABASE_URL = "postgresql://admin:admin@postgres:5432/rakuten_db" #BUG: Change to .env  #"sqlite:///./sql_app.db"
+USER = os.getenv("POSTGRES_USER")
+PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DATABASE = os.getenv("POSTGRES_DB")
+SQLALCHEMY_DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@postgres:5432/{ DATABASE }" #"sqlite:///./sql_app.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 engine = create_engine(
