@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.layers import Input, Embedding, LSTM, Dense
+from tensorflow.keras.layers import Input, Embedding, LSTM, Dense, Dropout, BatchNormalization, Conv2D, MaxPooling2D
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
 from tensorflow.keras.applications.vgg16 import VGG16
@@ -12,11 +12,13 @@ import pandas as pd
 from sklearn.utils import resample
 import numpy as np
 from tensorflow.keras.applications.vgg16 import preprocess_input
+from tensorflow.keras import regularizers
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 from sklearn.metrics import accuracy_score
 from tensorflow import keras
 import pickle
 import json
+from .fusion_model_helper_functions import *
 
 
 class TextLSTMModel:
@@ -48,15 +50,25 @@ class TextLSTMModel:
             padding="post",
             truncating="post",
         )
-
+        
         text_input = Input(shape=(self.max_sequence_length,))
-        embedding_layer = Embedding(input_dim=self.max_words, output_dim=128)(
-            text_input
-        )
-        lstm_layer = LSTM(128)(embedding_layer)
-        output = Dense(27, activation="softmax")(lstm_layer)
+        text_model = Embedding(input_dim=self.max_words, output_dim=128)(text_input)
+        text_model = LSTM(128, return_sequences=True)(text_model)
+        text_model = Dropout(0.5)(text_model)
+        text_model = LSTM(64, return_sequences=False)(text_model)
+        text_model = Dropout(0.5)(text_model)
+        text_model = BatchNormalization()(text_model)
+        text_model = Dense(128, activation='relu')(text_model)
+        text_model = BatchNormalization()(text_model)
+        text_model = Dense(64, activation = 'relu')(text_model)
+        text_model = Dropout(.5)(text_model)
+        output = Dense(27, activation="softmax")(text_model)
 
-        self.model = Model(inputs=[text_input], outputs=output)
+        self.model = Model(inputs=text_input, outputs=output)
+
+        
+
+
 
         self.model.compile(
             optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
@@ -121,23 +133,41 @@ class ImageVGG16Model:
             shuffle=False,  # Pas de mélange pour le set de validation
         )
 
-        image_input = Input(
-            shape=(224, 224, 3)
-        )  # Adjust input shape according to your images
+        # image_input = Input(
+        #     shape=(224, 224, 3)
+        # )  # Adjust input shape according to your images
 
-        vgg16_base = VGG16(
-            include_top=False, weights="imagenet", input_tensor=image_input
-        )
+        # vgg16_base = VGG16(
+        #     include_top=False, weights="imagenet", input_tensor=image_input
+        # )
 
-        x = vgg16_base.output
-        x = Flatten()(x)
-        x = Dense(256, activation="relu")(x)  # Add some additional layers if needed
-        output = Dense(num_classes, activation="softmax")(x)
+        # x = vgg16_base.output
+        # x = Flatten()(x)
+        # x = Dense(256, activation="relu")(x)  # Add some additional layers if needed
+        # output = Dense(num_classes, activation="softmax")(x)
 
-        self.model = Model(inputs=vgg16_base.input, outputs=output)
+        # self.model = Model(inputs=vgg16_base.input, outputs=output)
 
-        for layer in vgg16_base.layers:
-            layer.trainable = False
+        # for layer in vgg16_base.layers:
+        #     layer.trainable = False
+
+        img_input = Input(shape=(224,224,3), name='img_input')
+        img_model = Conv2D(64, (3,3),1, activation='relu',kernel_regularizer=regularizers.l1(0.001))(img_input)
+        img_model = MaxPooling2D()(img_model)
+        img_model = Conv2D(32, (3,3), 1, activation='relu',kernel_regularizer=regularizers.l1(0.001))(img_model)
+        img_model = MaxPooling2D()(img_model)
+        img_model = Conv2D(16, (3,3), 1, activation='relu',kernel_regularizer=regularizers.l1(0.001))(img_model)
+        img_model = MaxPooling2D()(img_model)
+        img_model = Dropout(rate = .4)(img_model)
+        img_model = Flatten()(img_model)
+        img_model = Dense(64, activation='relu')(img_model)
+        img_model = BatchNormalization()(img_model)
+        img_model = Dropout(rate=.4)(img_model)
+        output = Dense(27, activation="softmax")(img_model)
+
+        self.model = Model(inputs=img_input, outputs=output)
+
+        
 
         self.model.compile(
             optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
@@ -251,3 +281,78 @@ class concatenate:
 
         return best_weights
 
+
+
+
+class FusionModel:
+    def __init__(self, tokenizer):
+        self.tokenizer = tokenizer
+        self.model = None
+
+
+
+    def preprocess_and_fit(self, X_train, y_train, X_val, y_val):
+        
+        
+        df_train = pd.concat([X_train, y_train.astype(str)], axis=1)
+        df_val = pd.concat([X_val, y_val.astype(str)], axis=1)
+
+
+        ds_train = df_to_dataset(df_train, target_col = "prdtypecode", features=['description', 'image_path'], batch_size = 32, tokenizer = self.tokenizer, max_sequence_length = 10, shuffle=True, seed=0, img_size=(250,250))
+        ds_val = df_to_dataset(df_val, target_col = "prdtypecode", features=['description', 'image_path'], batch_size = 32, tokenizer = self.tokenizer, max_sequence_length = 10, shuffle=True, seed=0, img_size=(250,250))
+    
+        
+        text_input = Input(shape=(10,), name='text_input')
+        text_model = Embedding(input_dim=10000, output_dim=128)(text_input)
+        text_model = LSTM(64, return_sequences=True)(text_model)
+        text_model = Dropout(0.5)(text_model)
+        text_model = LSTM(64, return_sequences=False)(text_model)
+        text_model = Dropout(0.5)(text_model)
+        text_model = Dense(128, activation='relu')(text_model)
+        text_model = BatchNormalization()(text_model)
+        
+
+        img_input = Input(shape=(250,250,3), name='img_input')
+        img_model = Conv2D(64, (3,3),1, activation='relu',kernel_regularizer=regularizers.l1(0.001))(img_input)
+        img_model = MaxPooling2D()(img_model)
+        img_model = Conv2D(32, (3,3), 1, activation='relu',kernel_regularizer=regularizers.l1(0.001))(img_model)
+        img_model = MaxPooling2D()(img_model)
+        img_model = Conv2D(16, (3,3), 1, activation='relu',kernel_regularizer=regularizers.l1(0.001))(img_model)
+        img_model = MaxPooling2D()(img_model)
+        img_model = Dropout(rate = .4)(img_model)
+        img_model = Flatten()(img_model)
+        img_model = Dense(64, activation='relu')(img_model)
+        img_model = BatchNormalization()(img_model)
+
+        concatenated = tf.keras.layers.Concatenate(axis=1)([text_model, img_model])
+
+        dense = Dense(128, activation = 'relu')(concatenated)
+        dense = Dropout(.5)(dense)
+        dense = Dense(64, activation = 'relu')(dense)
+        dense = Dropout(.5)(dense)
+        out = tf.keras.layers.Dense(27, activation='softmax')(dense)
+
+        self.model = Model([text_input, img_input], out)
+
+
+
+        self.model.compile(
+            optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
+        )
+
+        lstm_callbacks = [
+            ModelCheckpoint(
+                filepath="models/best_lstm_model.keras", save_best_only=True
+            ),  # Enregistre le meilleur modèle
+            EarlyStopping(
+                patience=3, restore_best_weights=True
+            ),  # Arrête l'entraînement si la performance ne s'améliore pas
+            TensorBoard(log_dir="logs"),  # Enregistre les journaux pour TensorBoard
+        ]
+
+        self.model.fit(
+            ds_train,
+            validation_data=ds_val,
+            epochs=1,
+            callbacks=lstm_callbacks
+        )
