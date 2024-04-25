@@ -54,5 +54,5 @@ jobs:
           echo "POSTGRES_PASSWORD: admin" >> .env
           docker-compose build
           sleep 10
-          docker-compose run
-          sleep 10
+          docker-compose run --service-ports
+          # docker-compose run
