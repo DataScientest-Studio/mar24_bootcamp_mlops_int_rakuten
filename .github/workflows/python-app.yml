@@ -38,3 +38,11 @@ jobs:
       run: |
         cd backend-app
         pytest
+
+  build-containers:
+      needs: test
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v3
+      - name: Build the containers
+        run: docker compose up
