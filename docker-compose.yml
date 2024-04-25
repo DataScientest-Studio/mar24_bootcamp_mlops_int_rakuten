@@ -31,8 +31,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U admin -d rakuten_db"]  # Health check command
       interval: 10s
       retries: 5 
-      start_period: 10s
-      timeout: 90s #changed to 90s from 5s
+      start_period: 90s #changed to 90s from 10s
+      timeout: 5s 
 
 networks:
   rakuten_network:
