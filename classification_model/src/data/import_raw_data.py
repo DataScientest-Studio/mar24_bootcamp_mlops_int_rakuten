@@ -53,8 +53,13 @@ def import_raw_data(raw_data_relative_path, filenames, bucket_folder_url):
                 response.status_code,
             )
     except Exception as e:
+<<<<<<< HEAD
         print("Test")
         print(f"An error occurred: {str(e)}")
+=======
+        print(f"An error occurred: {str(e)}")
+
+>>>>>>> 6eca2b6 (fix typo?)
 
 
 def main(
