@@ -39,17 +39,17 @@ jobs:
         cd backend-app
         pytest
 
-  build-env-file:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v3
-      - name: Build the env file
-        run: |
-          touch .env
-          echo "POSTGRES_DB: rakuten_db" >> .env
-          echo "POSTGRES_USER: admin" >> .env
-          echo "POSTGRES_PASSWORD: admin" >> .env
+  # build-env-file:
+  #     needs: build
+  #     runs-on: ubuntu-latest
+  #     steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Build the env file
+  #       run: |
+  #         touch .env
+  #         echo "POSTGRES_DB: rakuten_db" >> .env
+  #         echo "POSTGRES_USER: admin" >> .env
+  #         echo "POSTGRES_PASSWORD: admin" >> .env
         
 
 
@@ -58,6 +58,10 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v3
-      - name: Build the containers
+      - name: Build the containers and the env file
         run: |
+          touch .env
+          echo "POSTGRES_DB: rakuten_db" >> .env
+          echo "POSTGRES_USER: admin" >> .env
+          echo "POSTGRES_PASSWORD: admin" >> .env
           docker-compose up
