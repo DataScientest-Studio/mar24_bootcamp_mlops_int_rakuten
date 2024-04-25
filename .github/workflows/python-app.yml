@@ -49,7 +49,7 @@ jobs:
         run: |
         # all these variables should be secrets of the repository
         #touch .env
-        echo POSTGRES_DB: rakuten_db >> .env
-        echo POSTGRES_USER: admin >> .env
-        echo POSTGRES_PASSWORD: admin >> .env
+        echo "POSTGRES_DB: rakuten_db" >> .env
+        echo "POSTGRES_USER: admin" >> .env
+        echo "POSTGRES_PASSWORD: admin" >> .env
         docker compose up
