@@ -46,7 +46,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build the env file
         run: |
-        # all these variables should be secrets of the repository
         touch .env
         echo "POSTGRES_DB: rakuten_db" >> .env
         echo "POSTGRES_USER: admin" >> .env
