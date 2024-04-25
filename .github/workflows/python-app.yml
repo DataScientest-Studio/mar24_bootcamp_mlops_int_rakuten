@@ -53,5 +53,7 @@ jobs:
           echo "POSTGRES_USER: admin" >> .env
           echo "POSTGRES_PASSWORD: admin" >> .env
           docker-compose build
-          sleep 90
+          docker images
+          sleep 10
           docker-compose up
+          sleep 10
