@@ -7,10 +7,23 @@ Model Pipeline
 
 
 
-Project Name
+Rakuten Product Category Classifier
 ==============================
 
-This project is a starting Pack for MLOps projects based on the subject "movie_recommandation". It's not perfect so feel free to make some modifications on it.
+Project Overview
+--------------
+
+This project provides a product category/type classifier of products from the French e-commerce provider Rakuten. The model can predict 27 different categories based on text and image input.
+
+Installation and Setup
+-------------
+To be filled:
+- data acquisition
+- training the model
+- starting the model
+- explain the pipeline
+- ...
+
 
 Project Organization
 ------------
@@ -58,5 +71,11 @@ Project Organization
     │   └── config         <- Describe the parameters used in train_model.py and predict_model.py
 
 --------
+
+Results and Evaluation
+---------------
+To be filled:
+- performance of the model
+- ...
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
