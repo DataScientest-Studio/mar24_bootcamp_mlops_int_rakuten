@@ -176,18 +176,6 @@ services:
     container_name: dockerproxy
     privileged: true
     volumes:
-<<<<<<< HEAD
-      - ./pgdata:/var/lib/postgresql/data
-    networks:
-      rakuten_network:
-        ipv4_address: 172.23.0.2
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d rakuten_db"]  # Health check command
-      interval: 10s
-      retries: 5 
-      start_period: 10s
-      timeout: 5s 
-=======
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - "2375:2375"
@@ -220,5 +208,4 @@ services:
 
 volumes:
   postgres-db-volume:
->>>>>>> 1fe122f (update)
 
