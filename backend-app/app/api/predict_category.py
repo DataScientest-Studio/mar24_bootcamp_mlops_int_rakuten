@@ -77,7 +77,7 @@ def check_model_validity(model_folder_metadata_file, s3_file, model_bucket, mode
             with open(metadata_file_path, 'w') as file:
                 file.write(datetime.strftime(datetime.now().date(), '%Y-%m-%d'))
         else:
-            pass
+            True
     except FileNotFoundError:
         download_from_aws(s3_file, model_bucket, model_folder_path)
         tar_file_path = os.path.join(model_folder_path, s3_file) 
@@ -127,41 +127,18 @@ def preprocess_img(image):
     input_image = input_image.astype(np.float32)
     return input_image
 
-@router.get('/aws_download/')
-async def aws_downlaod():
-    download_from_aws(S3_FILE, MODEL_BUCKET, MODEL_FOLDER_PATH)
-    dir = os.listdir('app')
-    return {'dir': dir}
-
 @router.post('/predict_category/')
 async def predict_category(image: UploadFile, designation: str, description: str, db:Session = Depends(get_db)):
     check_model_validity(MODEL_FOLDER_METADATA_FILE, S3_FILE, MODEL_BUCKET, MODEL_FOLDER_PATH)
     input_text = preprocess_text(designation, description)
     padded_sequence = tokenize_text(TOKENIZER_CONFIG_FILE_PATH, input_text)
     image = await image.read()
-    # if image.filename.split('.')[img = tf.image.resize(img, size=img_size)1] in  ['png':
-    #     pass
     input_img = preprocess_img(image)
 
     prediction = fusion_prediction(padded_sequence, input_img)
     max_idx = np.argmax(prediction)
     max_val = prediction[0,max_idx]
     cat = get_product_category_by_label(db, int(max_idx))
-    # return {'pred':str(prediction)}
-    return {'cat':cat.category, 'prob':str(np.array(max_val))}
 
+    return {'cat':cat.category, 'prob':str(np.array(max_val)), 'prediction':str(prediction)}
 
-# @router.post'/fileupload/', response_model=User
-# async def create_upload_filefile: UploadFile, current_user: Annotated[User,  Depends(get_current_active_user)]:
-#     # TODO: use CSV, 
-#     # TODO: catch wrong content 
-#     # 
-#     try:
-#         if file.filename.split('.')[-1] == 'xlsx': # WARNING: create check_file_type functin?
-#             df = pd.read_excel(file.file)
-#             df = pd.melt(df, id_vars=['name', 'email', 'id'], var_name='date', value_name='value')
-#             return JSONResponse(df.head().to_json())
-#         else:
-#             raise HTTPException(status_code=422, detail='File needs to have .xlsx format.')
-#     except Exception as e:
-#         raise e
