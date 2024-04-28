@@ -62,3 +62,5 @@ wrapt==1.14.0
 nltk
 beautifulsoup4
 scikit-learn
+python-dotenv
+boto3

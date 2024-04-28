@@ -19,7 +19,7 @@ from tensorflow import keras
 import pickle
 import json
 from .fusion_model_helper_functions import *
-
+# import mlflow 
 
 class TextLSTMModel:
     def __init__(self, max_words=10000, max_sequence_length=10):
@@ -212,7 +212,6 @@ class concatenate:
         # Réinitialiser les index des DataFrames
         new_X_train = new_X_train.reset_index(drop=True)
         new_y_train = new_y_train.reset_index(drop=True)
-        print(new_y_train)
         new_y_train = new_y_train['prdtypecode'].values.astype(int)
         # new_y_train = new_y_train.values.reshape(1350).astype("int")
 
@@ -259,7 +258,7 @@ class concatenate:
             final_predictions = np.argmax(combined_predictions, axis=1)
             accuracy = accuracy_score(y_train, final_predictions)
 
-            if accuracy > best_accuracy:
+            if accuracy > best_accuracy:# Training loop with tracking metrics
                 best_accuracy = accuracy
                 best_weights = (lstm_weight, vgg16_weight)
 
@@ -269,14 +268,16 @@ class concatenate:
 
 
 class FusionModel:
-    def __init__(self, tokenizer):
+    def __init__(self, tokenizer, experiment_name=None):
         self.tokenizer = tokenizer
         self.model = None
+        self.experiment_name = experiment_name
 
 
 
-    def preprocess_and_fit(self, X_train, y_train, X_val, y_val):
-        
+    def preprocess_and_fit(self, X_train, y_train, X_val, y_val, epochs=1):
+        # if self.experiment_name: 
+        #     mlflow.set_experiment(experiment_name=self.experiment_name) 
         
         df_train = pd.concat([X_train, y_train], axis=1)
         df_val = pd.concat([X_val, y_val], axis=1)
@@ -324,19 +325,32 @@ class FusionModel:
             optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
         )
 
-        lstm_callbacks = [
+        fusion_callbacks = [
             ModelCheckpoint(
-                filepath="models/best_lstm_model.keras", save_best_only=True
+                filepath="models/best_fusion_model.keras", save_best_only=True
             ),  # Enregistre le meilleur modèle
             EarlyStopping(
                 patience=3, restore_best_weights=True
             ),  # Arrête l'entraînement si la performance ne s'améliore pas
             TensorBoard(log_dir="logs"),  # Enregistre les journaux pour TensorBoard
         ]
-
         self.model.fit(
             ds_train,
             validation_data=ds_val,
             epochs=1,
-            callbacks=lstm_callbacks
+            callbacks=fusion_callbacks
         )
+        # # Training loop with tracking metrics
+        # for epoch in range(epochs):
+        #     history = self.model.fit(ds_train, validation_data=ds_val, epochs=1, callbacks=fusion_callbacks)
+        #     
+        #     train_loss = history.history['loss'][0]
+        #     train_accuracy = history.history['accuracy'][0]
+        #     validation_loss = history.history['val_loss'][0]
+        #     validation_accuracy = history.history['val_accuracy'][0]
+        #     
+        #     # Log metrics with MLflow
+        #     mlflow.log_metric("train_loss", train_loss)
+        #     mlflow.log_metric("train_accuracy", train_accuracy)
+        #     mlflow.log_metric("validation_loss", validation_loss)
+        #     mlflow.log_metric("validation_accuracy", validation_accuracy)
