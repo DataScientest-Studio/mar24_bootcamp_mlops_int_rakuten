@@ -90,4 +90,12 @@ target/
 
 # Additional 
 backend-app/sql_app.db
-
+airflow.sh
+classification_model/src/.env
+classification_model/data
+classification_model/logs
+classification_model/models/best_vgg16_model.keras
+classification_model/models/best_weights.json
+classification_model/models/best_weights.pkl
+classification_model/models/concatenate.keras
+classification_model/models/mapper.pkl
