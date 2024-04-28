@@ -33,7 +33,7 @@ dic_code_to_category = [
     [26,  1940 , "Confectionery"]
 ]
 engine = create_engine(
-        'postgresql://admin:admin@localhost:5432/rakuten_db'
+        'postgresql://admin:admin@postgres:5432/rakuten_db'
 )
 with engine.connect() as connection:
 
