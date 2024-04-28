@@ -14,17 +14,17 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(predict_category.router)
 
-@app.middleware("http")
-async def log_requests_middleware(request: Request, call_next):
-    request_body = await request.body()
-    response = await call_next(request)
-    # response_body = [chunk async for chunk in response.body_iterator]
-    # BUG: Leads to:
-    # raise LocalProtocolError("Too little data for declared Content-Length")
-    # response already consumed? 
-    response_body = ""
-    await log_requests(request, request_body, response, response_body)
-    return response
+# @app.middleware("http")
+# async def log_requests_middleware(request: Request, call_next):
+#     request_body = await request.body()
+#     response = await call_next(request)
+#     # response_body = [chunk async for chunk in response.body_iterator]
+#     # BUG: Leads to:
+#     # raise LocalProtocolError("Too little data for declared Content-Length")
+#     # response already consumed? 
+#     response_body = ""
+#     await log_requests(request, request_body, response, response_body)
+#     return response
 
 @app.get('/')
 async def root():
