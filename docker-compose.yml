@@ -1,6 +1,163 @@
-version: '3.9'
+x-airflow-common: &airflow-common
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.1.1}
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/rakuten_db
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:admin@postgres/rakuten_db
+    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+    AIRFLOW__CORE__FERNET_KEY: ""
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.basic_auth"
+    AIRFLOW__SMTP__SMTP_HOST: "smtp.gmail.com"
+    AIRFLOW__SMTP__SMTP_PORT: 587
+    AIRFLOW__SMTP__SMTP_USER: "de.airflow@gmail.com"
+    AIRFLOW__SMTP__SMTP_PASSWORD: "cfsrvkongsobheta"
+    AIRFLOW__SMTP__SMTP_MAIL_FROM: "de.airflow@gmail.com"
+    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: True 
+
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- } #scikit-learn
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/plugins
+    # - /var/run/docker.sock:/var/run/docker.sock
+    - type: bind
+      source: ./airflow/clean_data
+      target: /app/clean_data
+    - type: bind
+      source: ./airflow/raw_files
+      target: /app/raw_files
+  user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
+  depends_on:
+    redis:
+      condition: service_healthy
+    postgres:
+      condition: service_healthy
 
 services:
+  #DB
+  postgres:
+    image: postgres:13
+    restart: always
+    env_file:
+    - .env
+    ports:
+    - "5432:5432"
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    # networks:
+    # - rakuten_network
+    healthcheck:
+      test: 
+      - "CMD-SHELL"
+      - "pg_isready -U admin -d rakuten_db"
+      interval: 5s 
+      retries: 5
+
+  #REDIS
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    # networks:
+    # - rakuten_network
+
+  # WEBSERVER
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    # networks:
+    #     - rakuten_network
+
+  #SCHEDULER
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    # networks:
+    # - rakuten_network
+
+  #WORKER
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    # networks:
+    # - rakuten_network
+
+  #INIT
+  airflow-init:
+    <<: *airflow-common
+    command: version
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_UPGRADE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-admin}
+    # networks:
+    # - rakuten_network
+
+  #FLOWER
+  flower:
+    <<: *airflow-common
+    command: celery flower
+    ports:
+      - 5555:5555
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    # networks:
+    #     - rakuten_network
+
+  dashboard:
+    image: datascientest/dashapp:1.0.0
+    volumes:
+      - type: bind
+        source: ./airflow/clean_data
+        target: /app/clean_data
+      - type: bind
+        source: ./airflow/raw_files
+        target: /app/raw_files
+    ports:
+      - 8050:8050
+    # networks:
+    # - rakuten_network
+
   rakuten_api:
     build:
       context: ./backend-app/
@@ -10,19 +167,16 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    networks:
-      rakuten_network:
-        ipv4_address: 172.23.0.3
-  postgres:
-    image: postgres:latest
-    restart: always
-    # set shared memory limit when using docker-compose
-    shm_size: 128mb
-    env_file:
-    - .env
     ports:
-    - "5432:5432"
+      - 8000:8000
+    # networks:
+    #   - rakuten_network
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy:latest
+    container_name: dockerproxy
+    privileged: true
     volumes:
+<<<<<<< HEAD
       - ./pgdata:/var/lib/postgresql/data
     networks:
       rakuten_network:
@@ -33,11 +187,38 @@ services:
       retries: 5 
       start_period: 10s
       timeout: 5s 
+=======
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "2375:2375"
+    environment:
+      CONTAINERS: 1
+      IMAGES: 1
+      AUTH: 1
+      POST: 1
+    restart: always
+  # docker-socket-proxy:
+  #   image: tecnativa/docker-socket-proxy:0.1.1
+  #   privileged : true
+  #   environment:
+  #     COTAINERS: 1
+  #     IMAGES: 1
+  #     AUTH: 1
+  #     POST: 1
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   restart: always 
 
-networks:
-  rakuten_network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.23.0.0/16
+
+# networks:
+#   rakuten_network:
+#     driver: bridge
+#     ipam:
+#       driver: default
+#       config:
+#         - subnet: 172.23.0.0/16
+
+volumes:
+  postgres-db-volume:
+>>>>>>> 1fe122f (update)
+
