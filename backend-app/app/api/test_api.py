@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from app.models.database import Product_Category
 
-
-
+# TODO: replace with .env?
 img_name_test = 'app/api/image_759577_product_120185380.jpg'
+
 
 client = TestClient(router)
 
