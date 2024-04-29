@@ -14,7 +14,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__SMTP__SMTP_USER: "de.airflow@gmail.com"
     AIRFLOW__SMTP__SMTP_PASSWORD: "cfsrvkongsobheta"
     AIRFLOW__SMTP__SMTP_MAIL_FROM: "de.airflow@gmail.com"
-    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: True 
+    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: "true"
 
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- } #scikit-learn
   volumes:
