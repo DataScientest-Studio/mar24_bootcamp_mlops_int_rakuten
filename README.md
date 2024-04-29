@@ -91,10 +91,13 @@ There for we have to set it up first.
 ```bash
 cd classification_model/
 ```
-2. create an virtual environment 
+2. create and activate a virtual environment 
 ``` bash
-python -m venv env
+python3.11 -m venv env
+#on linux
+source env/bin/activate
 ```
+
 3. Install requirements
 ``` bash
 pip install -r requirements.txt <- It will install the required packages
@@ -103,6 +106,7 @@ pip install -r requirements.txt <- It will install the required packages
 ```
 python src/data/import_raw_data.py <- It will import the tabular data on data/raw/
 ```
+**Important** only confirm the first question with **yes** the second one with **no**
 5. Upload the image data folder set directly on local from https://challengedata.ens.fr/participants/challenges/35/, you should save the folders image_train and image_test respecting the following structure
 ```
 ├── data
