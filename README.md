@@ -1,30 +1,3 @@
-# TODO:
-20 Minutes PP
-Talk about project
-talk about architecture 
-
-
-
-GitHub Action Docker Build
-
-~~docker airflow~~
-docker Model
-docker MLflow
-
-Model:
-- store text data in db + img name /url
-- store images in E3 Bucket
-
-API: 
-- text data db model
-- model crud functions
-- include model crud into predict endpoint 
-
-
-Docoumentation 
-
-
-
 Rakuten Product Category Classifier
 Project Overview
 --------------
@@ -188,3 +161,15 @@ Project Organization
     ├── references
     └── reports
         └── figures
+
+# Future improvments/To-Dos
+- Tests for all functions
+- Test for all endpoints
+- Test container functionality
+- refine endpoints
+- add more endpoints
+- DB for text and images
+- retraining on new data
+- MLflow monitoring
+- Update model based on monitoring
+ 
