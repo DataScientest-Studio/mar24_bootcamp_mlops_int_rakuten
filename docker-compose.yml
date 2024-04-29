@@ -21,7 +21,6 @@ x-airflow-common: &airflow-common
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs
     - ./airflow/plugins:/opt/airflow/plugins
-    # - /var/run/docker.sock:/var/run/docker.sock
     - type: bind
       source: ./airflow/clean_data
       target: /app/clean_data
@@ -185,26 +184,6 @@ services:
       AUTH: 1
       POST: 1
     restart: always
-  # docker-socket-proxy:
-  #   image: tecnativa/docker-socket-proxy:0.1.1
-  #   privileged : true
-  #   environment:
-  #     COTAINERS: 1
-  #     IMAGES: 1
-  #     AUTH: 1
-  #     POST: 1
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   restart: always 
-
-
-# networks:
-#   rakuten_network:
-#     driver: bridge
-#     ipam:
-#       driver: default
-#       config:
-#         - subnet: 172.23.0.0/16
 
 volumes:
   postgres-db-volume:

@@ -1,5 +1,5 @@
 FROM tensorflow/tensorflow:2.15.0
-# FROM python:3.11
+# FROM python:3.11 # <-- for mlflow implementation 
 
 ADD requirements.txt requirements.txt
 ADD .env .env
@@ -16,12 +16,6 @@ ADD /models/ /models/
 ADD /logs/ /logs/
 
 WORKDIR /
-
-# VOLUME /mlruns
-
-# RUN adduser --disabled-password --gecos '' admin
-#
-# USER admin
 
 
 CMD python3 src/main.py
