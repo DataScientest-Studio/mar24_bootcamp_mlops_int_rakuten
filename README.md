@@ -1,6 +1,6 @@
-Rakuten Product Category Classifier
-Project Overview
---------------
+# Rakuten Product Category Classifier
+
+## Project Overview
 
 The purpose of this project is twofold: On the one hand, we created a neural network which is capable of accurately predicting the category (product type) of Rakuten e-commerce products. On the other hand, we implemented a DevOps structure to upkeep and deploy the application.
 
@@ -10,17 +10,17 @@ After training, the model and its configuration files are packaged as tar-files 
 
 The implementation scheme can be depicted as follows
 ![image info](./implementation_scheme.drawio.png)
-# What is in the .github
+## What is in the .github
 The GitHub Action include the follwoing 
 - flask8
 - PyTests
 - Docker start up
 
-## Installation and Setup
-### Prerequisites
+### Installation and Setup
+#### Prerequisites
 - Docker
 - Python 3.11
-### .env
+#### .env
 The application expects  an .env file in the project root directory.
 ```.env
 # Airflow settings
@@ -50,7 +50,7 @@ AWS_ACCESS_KEY_ID=<-- ADD!
 AWS_SECRET_ACCESS_KEY=<-- ADD!
 MODEL_BUCKET=rakuten-models
 ```
-### Model Docker Image
+#### Model Docker Image
 To enable retraining of the Model it is necessary to create the docker image for the model locally.
 There for we have to set it up first.
 1. Navigate into the model folder
@@ -102,7 +102,7 @@ python src/main.py
 docker build . -t rakuten_cf:latest
 ```
 
-### Run the complete application 
+#### Run the complete application 
 Navigate into the project root directory.
 Then set docker host, to enable Airflow to start docker container on the local host
 ```bash
@@ -162,7 +162,7 @@ Project Organization
     └── reports
         └── figures
 
-# Future improvments/To-Dos
+## Future improvments/To-Dos
 - Tests for all functions
 - Test for all endpoints
 - Test container functionality
