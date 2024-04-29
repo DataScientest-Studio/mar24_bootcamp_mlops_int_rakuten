@@ -99,6 +99,7 @@ pip install -r requirements.txt
 python src/data/import_raw_data.py
 ```
 **Important** only confirm the first question with **yes** the second one with **no**
+
 5. Upload the image data folder set directly on local from https://challengedata.ens.fr/participants/challenges/35/, you should save the folders image_train and image_test respecting the following structure
 ```
 ├── data
@@ -136,7 +137,7 @@ export DOCKER_HOST=tcp://localhost:2375
 ```
 Initiate Airflow init
 ```bash
-dockerd;compose up airflow-init
+docker-compose up airflow-init
 ```
 From now you can start the application with
 ```bash
@@ -147,75 +148,42 @@ FastApi: localhost:8000
 
 Project Organization
 ------------
-    ├── backend-app                # FastAPI application 
-    │   ├── app                    # Fast API logic folder
-    │   │   ├── api                # API endpoint implementations
-    │   │   │   ├── auth.py        # Authentication related code
-    │   │   │   ├── image_759577_product_120185380.jpg  # Image file for testing #! WRONG possition 
-    │   │   │   ├── __init__.py
-    │   │   │   ├── predict_category.py  # Prediction category endpoint
-    │   │   │   ├── test_api.py    # API testing module #! WRONG position 
-    │   │   │   └── users.py       # User endpoint implementation
-    │   │   ├── config             # Configuration files
-    │   │   │   ├── config.py      # Configuration settings
-    │   │   │   └── __init__.py
-    │   │   ├── core               # Core functionality
-    │   │   │   ├── __init__.py
-    │   │   │   ├── logger.py      # Logging utility
-    │   │   │   ├── security.py    # Security-related functions
-    │   │   │   └── settings.py    # Application settings
-    │   │   ├── __init__.py
-    │   │   ├── main.py            # Main application entry point
-    │   │   ├── models             # Data models
-    │   │   │   ├── database.py    # Database related functions
-    │   │   │   ├── __init__.py
-    │   │   │   ├── token.py       # Token management functions
-    │   │   │   └── user.py        # User data model
-    │   │   ├── sql_db             # SQL database module
-    │   │   │   ├── crud.py        # CRUD operations for SQL database
-    │   │   │   ├── database.py    # Database connection setup
-    │   │   │   └── __init__.py
-    │   │   └── tf_models          # TensorFlow models
-    │   ├── Dockerfile             # Dockerfile for the FastAPI
-    │   ├── requirements.txt       # Requirements file for the backend application
-    │   ├── setup_prdcat_tabel.py  # Script for setting up product category table
-    │   └── tests                  # Test files
-    │       ├── api_test           # API test files
-    │       ├── __init__.py
-    │       └── unit               # Unit test files
-    │           ├── __init__.py
-    │           └── test_crud.py   # CRUD test module
-    ├── docker-compose.yml         # Docker Compose configuration file
-    ├── LICENSE                     # License file
-    ├── models                      # Models folder (possibly for trained ML models)
-    ├── notebooks                   # Notebooks folder (possibly for Jupyter notebooks)
-    ├── pgdata                      # PostgreSQL data folder (error opening directory)
-    ├── README.md                   # README file
-    ├── references                  # References folder
-    ├── reports                     # Reports folder
-    │   └── figures                 # Figures folder within reports
-    ├── requirements.txt            # Top-level requirements file
-    └── src                         # Source code folder
-        ├── config                  # Configuration files
-        ├── data                    # Data processing scripts
-        │   ├── __init__.py
-        │   └── make_dataset.py     # Script for making datasets
-        ├── features                # Feature engineering scripts
-        │   ├── build_features.py   # Script for building features
-        │   └── __init__.py
-        ├── __init__.py
-        ├── models                  # Machine learning models
-        │   ├── __init__.py
-        │   ├── predict_model.py    # Prediction model script
-        │   └── train_model.py      # Training model script
-        └── visualization           # Visualization scripts
-            ├── __init__.py
-            └── visualize.py        # Visualization script
-
-
-Results and Evaluation
----------------
-To be filled:
-- performance of the model
-- ...
-0d08c7c9d8fa
+├── airflow                 <-- required folder structure for airflow
+│   ├── clean_data
+│   ├── dags                <-- dag for model retraining 
+│   ├── logs
+│   ├── plugins
+│   └── raw_files
+├── backend-app             <-- FastApi application
+│   ├── app
+│   │   ├── api             <-- endpoints
+│   │   ├── config
+│   │   ├── core            <-- universal functions
+│   │   ├── models          <-- pydantic models
+│   │   ├── sql_db          <-- db functionality
+│   │   └── tmp_data        <-- folder to store model
+│   └── tests               <-- API Tests
+│       ├── api_test
+│       └── unit
+├── classification_model    <-- Model application
+│   ├── data
+│   │   ├── preprocessed
+│   │   │   ├── image_test
+│   │   │   └── image_train
+│   │   └── raw
+│   │       ├── image_test
+│   │       └── image_train
+│   ├── logs
+│   │   ├── train
+│   │   └── validation
+│   ├── models              <-- trained models + config files
+│   ├── notebooks
+│   └── src                 <-- Model Code
+│       ├── core
+│       ├── data
+│       ├── features
+│       ├── models
+│       └── visualization
+├── references
+└── reports
+    └── figures
