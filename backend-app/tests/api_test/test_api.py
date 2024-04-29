@@ -5,7 +5,7 @@ import tensorflow as tf
 from app.models.database import Product_Category
 
 # TODO: replace with .env?
-img_name_test = 'backend-app/tests/api_test/image_759577_product_120185380.jpg'
+img_name_test = 'tests/api_test/image_759577_product_120185380.jpg'
 test_prediction = tf.constant([[0.02415627, 0.03744585, 0.06960037, 0.02850509, 0.01205792, 0.01704547,
                                   0.03257139, 0.04715945, 0.07248406, 0.07602803, 0.03835761, 0.05048478,
                                   0.01647786, 0.03617582, 0.01722865, 0.11012374, 0.0331501,  0.04468789,
