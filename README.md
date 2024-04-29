@@ -24,31 +24,21 @@ API:
 Docoumentation 
 
 
-# Descriptions Organization 
-
-# How to launch the app
-## FastApi, Airflow, PostgreSQL
-To start the application just use
-```bash
-docker-compose up
-this starts all required services 
-```
-
-# What does it do?
-This application starts three docker container.
-1. PostgreSQL Database (raktuen_db)which stores the data for user, logs, model data
-2. FastAPI provides the connections to db and functionality predicting category 
-3. Airflow (exclude?)
-
-
-# What is in the .github
-
 
 Rakuten Product Category Classifier
 Project Overview
 --------------
 
-This project provides a product category/type classifier of products from the French e-commerce provider Rakuten. The model can predict 27 different categories based on text and image input.
+The purpose of this project is twofold: On the one hand, we created a neural network which is capable of accurately predicting the category (product type) of Rakuten e-commerce products. On the other hand, we implemented a DevOps structure to upkeep and deploy the application.
+The model is a deep learning fusion model, i.e. the model handles multi-modal inputs (text and images). These inputs are the product piucture as well as the product description and designation. The text runs through a few LSTM layers, whereas the images are fed into a series of standard CNN blocks. In the end the layers are concatinated for a final prediction. After proper preprocessing and training, this architecture is capable of reaching around 76% accuracy on the data (roughly 84000 products belonging to 27 different classes).
+After training, the model and its configuration files are packaged as tar-files and uploaded to an AWS S3 bucket. The API checks the validity of its model data and can update those by downloading the newest model from the S3 bucket. The API then enables the prediction of the category and this API also includes a user database for authentication purposes. Both these features are isolated and deployed in Docker containers. Moreover, we implemented a CI/CD pipeline using GitHub actions. This pipeline runs tests on the code and spins up the Docker containers ensuring their functionality. On top of that we have included an Airflow instance which triggers a re-training of the model on a weekly basis which gets saved in the S3 bucket on the AWS cloud. This re-training is currently happening on the same data that was used for the intial training. Given one's specific needs, one can easily add different DAGs to this Airflow instance.
+The implementation scheme can be depicted as follows
+
+# What is in the .github
+The GitHub Action include the follwoing 
+- flask8
+- PyTests
+- Docker start up
 
 ## Installation and Setup
 ### Prerequisites
@@ -97,14 +87,13 @@ python3.11 -m venv env
 #on linux
 source env/bin/activate
 ```
-
 3. Install requirements
 ``` bash
-pip install -r requirements.txt <- It will install the required packages
+pip install -r requirements.txt 
 ```
 4. Set up folder structure for data
 ```
-python src/data/import_raw_data.py <- It will import the tabular data on data/raw/
+python src/data/import_raw_data.py
 ```
 **Important** only confirm the first question with **yes** the second one with **no**
 5. Upload the image data folder set directly on local from https://challengedata.ens.fr/participants/challenges/35/, you should save the folders image_train and image_test respecting the following structure
@@ -114,35 +103,43 @@ python src/data/import_raw_data.py <- It will import the tabular data on data/ra
 |   |  ├── image_train 
 |   |  ├── image_test 
 ```
+6. Then preprocess the data with 
 ``` bash
-python src/data/make_dataset.py data/raw data/preprocessed <- It will copy the raw dataset and paste it on data/preprocessed/
-```
-6. Testing the model code before containerizing
-6.1. create a .env file in the classification_model folder
+python src/data/make_dataset.py data/raw data/preprocessed ```
+7. Testing the model code before containerizing
+7.1. create a .env file in the classification_model folder
 ```.env
 AWS_ACCESS_KEY_ID= <-- your AWS ACCESS KEY ID 
 AWS_SECRET_ACCESS_KEY= <-- your AWS SECRET ACCESS KEY
 MODEL_BUCKET=rakuten-models <-- Change if necessary 
 MODEL_FOLDER=models
 ```
-6.2. Run the model
+7.2. Run the model
 ```bash
 python src/main.py
 ```
-7. Then create the docker image
+8. Then create the docker image
 ```bash
 docker build . -t rakuten_cf:latest
 ```
+
 ### Run the complete application 
 Navigate into the project root directory.
 Then set docker host, to enable Airflow to start docker container on the local host
 ```bash
 export DOCKER_HOST=tcp://localhost:2375
 ```
-Start the application with
+Initiate Airflow init
+```bash
+dockerd;compose up airflow-init
+```
+From now you can start the application with
 ```bash
 docker-compose up
 ```
+Airflow: localhost:8080
+FastApi: localhost:8000
+
 Project Organization
 ------------
     ├── backend-app                # FastAPI application 
@@ -216,4 +213,4 @@ Results and Evaluation
 To be filled:
 - performance of the model
 - ...
-
+0d08c7c9d8fa
