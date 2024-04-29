@@ -144,46 +144,47 @@ From now you can start the application with
 docker-compose up
 ```
 Airflow: localhost:8080
+
 FastApi: localhost:8000
 
 Project Organization
 ------------
-├── airflow                 <-- required folder structure for airflow
-│   ├── clean_data
-│   ├── dags                <-- dag for model retraining 
-│   ├── logs
-│   ├── plugins
-│   └── raw_files
-├── backend-app             <-- FastApi application
-│   ├── app
-│   │   ├── api             <-- endpoints
-│   │   ├── config
-│   │   ├── core            <-- universal functions
-│   │   ├── models          <-- pydantic models
-│   │   ├── sql_db          <-- db functionality
-│   │   └── tmp_data        <-- folder to store model
-│   └── tests               <-- API Tests
-│       ├── api_test
-│       └── unit
-├── classification_model    <-- Model application
-│   ├── data
-│   │   ├── preprocessed
-│   │   │   ├── image_test
-│   │   │   └── image_train
-│   │   └── raw
-│   │       ├── image_test
-│   │       └── image_train
-│   ├── logs
-│   │   ├── train
-│   │   └── validation
-│   ├── models              <-- trained models + config files
-│   ├── notebooks
-│   └── src                 <-- Model Code
-│       ├── core
-│       ├── data
-│       ├── features
-│       ├── models
-│       └── visualization
-├── references
-└── reports
-    └── figures
+    ├── airflow                 <-- required folder structure for airflow
+    │   ├── clean_data
+    │   ├── dags                <-- dag for model retraining 
+    │   ├── logs
+    │   ├── plugins
+    │   └── raw_files
+    ├── backend-app             <-- FastApi application
+    │   ├── app
+    │   │   ├── api             <-- endpoints
+    │   │   ├── config
+    │   │   ├── core            <-- universal functions
+    │   │   ├── models          <-- pydantic models
+    │   │   ├── sql_db          <-- db functionality
+    │   │   └── tmp_data        <-- folder to store model
+    │   └── tests               <-- API Tests
+    │       ├── api_test
+    │       └── unit
+    ├── classification_model    <-- Model application
+    │   ├── data
+    │   │   ├── preprocessed
+    │   │   │   ├── image_test
+    │   │   │   └── image_train
+    │   │   └── raw
+    │   │       ├── image_test
+    │   │       └── image_train
+    │   ├── logs
+    │   │   ├── train
+    │   │   └── validation
+    │   ├── models              <-- trained models + config files
+    │   ├── notebooks
+    │   └── src                 <-- Model Code
+    │       ├── core
+    │       ├── data
+    │       ├── features
+    │       ├── models
+    │       └── visualization
+    ├── references
+    └── reports
+        └── figures
