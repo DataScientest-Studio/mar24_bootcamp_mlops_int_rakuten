@@ -85,3 +85,4 @@ urllib3==2.2.1
 uvicorn==0.28.0
 Werkzeug==3.0.2
 wrapt==1.14.1
+boto3
