@@ -36,7 +36,7 @@ The model is a deep learning fusion model, i.e. the model handles multi-modal in
 After training, the model and its configuration files are packaged as tar-files and uploaded to an AWS S3 bucket. The API checks the validity of its model data and can update those by downloading the newest model from the S3 bucket. The API then enables the prediction of the category and this API also includes a user database for authentication purposes. Both these features are isolated and deployed in Docker containers. Moreover, we implemented a CI/CD pipeline using GitHub actions. This pipeline runs tests on the code and spins up the Docker containers ensuring their functionality. On top of that we have included an Airflow instance which triggers a re-training of the model on a weekly basis which gets saved in the S3 bucket on the AWS cloud. This re-training is currently happening on the same data that was used for the intial training. Given one's specific needs, one can easily add different DAGs to this Airflow instance.
 
 The implementation scheme can be depicted as follows
-[!implementation_scheme.drawio.png]
+![image info](./implementation_scheme.drawio.png)
 # What is in the .github
 The GitHub Action include the follwoing 
 - flask8
