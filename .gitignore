@@ -99,4 +99,7 @@ classification_model/models/best_weights.json
 classification_model/models/best_weights.pkl
 classification_model/models/concatenate.keras
 classification_model/models/mapper.pkl
-airflow
+airflow/raw_files/*
+airflow/logs/*
+airflow/plugins/*
+ariflow/clean_data/*
