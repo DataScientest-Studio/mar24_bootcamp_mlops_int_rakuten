@@ -25,18 +25,18 @@ text_preprocessor.preprocess_text_in_df(X_val, columns=["description"])
 image_preprocessor.preprocess_images_in_df(X_train)
 image_preprocessor.preprocess_images_in_df(X_val)
 
-# # Train LSTM model
-# print("Training LSTM Model")
-# text_lstm_model = TextLSTMModel()
-# text_lstm_model.preprocess_and_fit(X_train, y_train, X_val, y_val)
-# print("Finished training LSTM")
-#
-# print("Training VGG")
-# # Train VGG16 model
-# image_vgg16_model = ImageVGG16Model()
-# image_vgg16_model.preprocess_and_fit(X_train, y_train, X_val, y_val)
-# print("Finished training VGG")
-#
+# Train LSTM model
+print("Training LSTM Model")
+text_lstm_model = TextLSTMModel()
+text_lstm_model.preprocess_and_fit(X_train, y_train, X_val, y_val)
+print("Finished training LSTM")
+
+print("Training VGG")
+# Train VGG16 model
+image_vgg16_model = ImageVGG16Model()
+image_vgg16_model.preprocess_and_fit(X_train, y_train, X_val, y_val)
+print("Finished training VGG")
+
 with open("models/tokenizer_config.json", "r", encoding="utf-8") as json_file:
     tokenizer_config = json_file.read()
 tokenizer = tf.keras.preprocessing.text.tokenizer_from_json(tokenizer_config)
