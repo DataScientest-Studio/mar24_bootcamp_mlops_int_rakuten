@@ -67,6 +67,10 @@ source env/bin/activate
 ``` bash
 pip install -r requirements.txt 
 ```
+3.1. in cases their is no model data on the AWS S3 bucket also run
+```bash
+pip install tensorflow==2.15.0
+```
 4. Set up folder structure for data
 ```
 python src/data/import_raw_data.py
@@ -104,17 +108,22 @@ docker build . -t rakuten_cf:latest
 
 #### Run the complete application 
 Navigate into the project root directory.
-Then set docker host, to enable Airflow to start docker container on the local host
+Create Airflow folder
 ```bash
-export DOCKER_HOST=tcp://localhost:2375
+mkdir airflow/clean_data airflow/raw_files airflow/logs airflow/plugins
 ```
 Initiate Airflow init
 ```bash
 docker-compose up airflow-init
 ```
-From now you can start the application with
+Start the application with
 ```bash
-docker-compose up
+docker-compose up --build
+```
+the `--build` flag is only necessary for the first time
+Then set docker host, to enable Airflow to start docker container on the local host
+```bash
+export DOCKER_HOST=tcp://localhost:2375
 ```
 Airflow: localhost:8080
 
