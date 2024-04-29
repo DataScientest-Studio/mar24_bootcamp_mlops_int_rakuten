@@ -108,7 +108,9 @@ python src/data/import_raw_data.py
 ```
 6. Then preprocess the data with 
 ``` bash
-python src/data/make_dataset.py data/raw data/preprocessed ```
+python src/data/make_dataset.py data/raw data/preprocessed 
+```
+
 7. Testing the model code before containerizing
 7.1. create a .env file in the classification_model folder
 ```.env
