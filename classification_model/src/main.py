@@ -1,6 +1,5 @@
 from features.build_features import DataImporter, TextPreprocessor, ImagePreprocessor
 from models.train_model import TextLSTMModel, ImageVGG16Model, concatenate, FusionModel
-from tensorflow import keras
 import pickle
 import tensorflow as tf
 import json
@@ -12,6 +11,7 @@ import os
 load_dotenv()
 MODEL_BUCKET= os.getenv('MODEL_BUCKET')
 MODEL_FOLDER= os.getenv('MODEL_FOLDER')
+fusion_model_epochs= int(os.getenv('FUSION_MODEL_EPOCHS'))
 
 data_importer = DataImporter()
 df = data_importer.load_data()
@@ -40,6 +40,18 @@ print("Finished training VGG")
 with open("models/tokenizer_config.json", "r", encoding="utf-8") as json_file:
     tokenizer_config = json_file.read()
 tokenizer = tf.keras.preprocessing.text.tokenizer_from_json(tokenizer_config)
+
+# Fusion Model
+print("Training Fusion Model")
+fusion_model = FusionModel(tokenizer, experiment_name='rakuten_fusion')
+fusion_model.preprocess_and_fit(X_train, y_train, X_val, y_val, epochs=fusion_model_epochs)
+print("Finshed training Fusion Model")
+
+tar_path = tar_folder(MODEL_FOLDER)
+print(tar_path)
+upload_to_aws(tar_path, MODEL_BUCKET, 'models.tar')
+
+# Fake Fusion Model
 # lstm = keras.models.load_model("models/best_lstm_model.keras")
 # vgg16 = keras.models.load_model("models/best_vgg16_model.keras")
 #
@@ -70,14 +82,3 @@ tokenizer = tf.keras.preprocessing.text.tokenizer_from_json(tokenizer_config)
 #
 # # Enregistrer le modèle au format h5
 # concatenate_model.save("models/concatenate.keras")
-
-# Fusion Model
-print("Training Fusion Model")
-fusion_model = FusionModel(tokenizer, experiment_name='rakuten_fusion')
-fusion_model.preprocess_and_fit(X_train, y_train, X_val, y_val, epochs=1)
-print("Finshed training Fusion Model")
-
-tar_path = tar_folder(MODEL_FOLDER)
-print(tar_path)
-upload_to_aws(tar_path, MODEL_BUCKET, 'models.tar')
-
