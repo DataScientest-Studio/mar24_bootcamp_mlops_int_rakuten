@@ -140,5 +140,5 @@ async def predict_category(image: UploadFile, designation: str, description: str
     max_val = prediction[0,max_idx]
     cat = get_product_category_by_label(db, int(max_idx))
 
-    return {'cat':cat.category, 'prob':str(np.array(max_val)), 'prediction':str(prediction)}
+    return {'cat':cat.category, 'prob':str(np.array(max_val))}
 
