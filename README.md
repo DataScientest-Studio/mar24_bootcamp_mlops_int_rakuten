@@ -118,10 +118,11 @@ docker-compose up airflow-init
 ```
 Start the application with
 ```bash
-docker-compose up --build
+docker-compose up -d --build
 ```
 the `--build` flag is only necessary for the first time
 Then set docker host, to enable Airflow to start docker container on the local host
+might requires restart
 ```bash
 export DOCKER_HOST=tcp://localhost:2375
 ```
