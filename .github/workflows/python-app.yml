@@ -57,6 +57,6 @@ jobs:
           docker-compose build
           sleep 10
           docker-compose run --service-ports
-          # we could push the images to DockerHub here as well
+          # we could push the images to DockerHub here as well!
           
           
