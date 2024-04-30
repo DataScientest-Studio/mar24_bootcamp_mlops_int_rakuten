@@ -3,11 +3,12 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Input, Embedding, LSTM, Dense, Dropout, BatchNormalization, Conv2D, MaxPooling2D
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, Callback, ReduceLROnPlateau
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.layers import Input, Dense, Flatten
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from timeit import default_timer as timer
 import pandas as pd
 from sklearn.utils import resample
 import numpy as np
@@ -20,6 +21,15 @@ import pickle
 import json
 from .fusion_model_helper_functions import *
 # import mlflow 
+
+class TimingCallback(Callback):
+    def __init__(self, logs={}):
+        self.logs=[]
+    def on_epoch_begin(self, epoch, logs={}):
+        self.starttime = timer()
+    def on_epoch_end(self, epoch, logs={}):
+        self.logs.append(timer()-self.starttime)
+
 
 class TextLSTMModel:
     def __init__(self, max_words=10000, max_sequence_length=10):
@@ -328,16 +338,30 @@ class FusionModel:
         fusion_callbacks = [
             ModelCheckpoint(
                 filepath="models/best_fusion_model.keras", save_best_only=True
-            ),  # Enregistre le meilleur modèle
+            ),  
             EarlyStopping(
-                patience=3, restore_best_weights=True
-            ),  # Arrête l'entraînement si la performance ne s'améliore pas
-            TensorBoard(log_dir="logs"),  # Enregistre les journaux pour TensorBoard
+                monitor = 'val_loss',
+                min_delta = .01,
+                patience = 5,
+                mode = 'min',
+                verbose = 1
+                # patience=3, restore_best_weights=True
+            ),  
+            ReduceLROnPlateau(
+                monitor = 'val_loss',
+                factor = .1,
+                patience = 3,
+                min_delta = .01,
+                cooldown = 4,
+                verbose = 1
+            ),
+            TimingCallback(),
+            TensorBoard(log_dir="logs"),
         ]
         self.model.fit(
             ds_train,
             validation_data=ds_val,
-            epochs=1,
+            epochs=epochs,
             callbacks=fusion_callbacks
         )
         # # Training loop with tracking metrics
